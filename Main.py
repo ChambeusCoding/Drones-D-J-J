@@ -12,9 +12,6 @@ if int(temp) >= 50:
     sleep(5)
 tello.takeoff()
 tello.move_left(100)
-for i in range(100):
-    tello.rotate_counter_clockwise(90)
-    i =+ 1
 tello.move_forward(100)
 
 tello.land()
