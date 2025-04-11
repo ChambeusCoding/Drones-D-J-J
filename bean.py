@@ -2,23 +2,27 @@ from djitellopy import Tello
 import cv2
 import threading
 from time import sleep
+import os
+import pygame
+
+def play_boss_music():
+    try:
+        pygame.mixer.init()
+        music_path = os.path.abspath("spin.mp3")
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.play(loops=-1)
+        
+    except Exception as e:
+        print("Error with playing sound.")
+        print(e)
 
 def move():
-    tello.rotate_clockwise(135)
-    sleep(12)
-    tello.flip_forward()
-    tello.set_speed(100)
-    tello.move_up(80)
-    tello.move_back(200)
-    tello.move_forward(200)
-    tello.rotate_counter_clockwise(360)
-    tello.rotate_clockwise(360)
-    # tello.move_up(40)
-    # tello.move_forward(20)
-    # tello.move_left(20)
-    # tello.move_back(20)
-    # tello.move_right(20)
-    # tello.flip_forward()
+    tello.move_up(30)
+    play_boss_music()
+    for i in range(25):
+        tello.rotate_clockwise(360)
+        i += 1
+        print(i)
 
 def cam():
     while True:
