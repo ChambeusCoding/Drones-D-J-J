@@ -1,14 +1,24 @@
 from djitellopy import Tello
 import cv2
 import threading
+from time import sleep
 
 def move():
-    tello.move_up(40)
-    tello.move_forward(20)
-    tello.move_left(20)
-    tello.move_back(20)
-    tello.move_right(20)
+    tello.rotate_clockwise(135)
+    sleep(12)
     tello.flip_forward()
+    tello.set_speed(100)
+    tello.move_up(80)
+    tello.move_back(200)
+    tello.move_forward(200)
+    tello.rotate_counter_clockwise(360)
+    tello.rotate_clockwise(360)
+    # tello.move_up(40)
+    # tello.move_forward(20)
+    # tello.move_left(20)
+    # tello.move_back(20)
+    # tello.move_right(20)
+    # tello.flip_forward()
 
 def cam():
     while True:
