@@ -152,7 +152,7 @@ def colordetect():
             time.sleep(5)
 
             # Optional break with key press
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if keyboard.is_pressed("i"):
                 break
 
     cv2.destroyAllWindows()
