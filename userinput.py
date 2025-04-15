@@ -101,62 +101,63 @@ def cam():
             break
     cv2.destroyAllWindows()
 
-def colordetect():
-    tello.streamon()
-    print("Starting color detection...")
+# def colordetect():
+#     tello.streamon()
+#     print("Starting color detection...")
 
-    # Ensure 'test runs' folder exists
-    folder_name = "test runs"
-    os.makedirs(folder_name, exist_ok=True)
+#     # Ensure 'test runs' folder exists
+#     folder_name = "test runs"
+#     os.makedirs(folder_name, exist_ok=True)
 
-    # Create timestamped file inside the folder
-    timestamp = datetime.now().strftime("%d-%m-%Y-%I:%M:%S %p")
-    filename = "RUNS.txt"
+#     # Create timestamped file inside the folder
+#     timestamp = datetime.now().strftime("%d-%m-%Y-%I:%M:%S %p")
+#     filename = "RUNS.txt"
 
-    with open(filename, 'w') as file:
-        while True:
-            frame = tello.get_frame_read().frame
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+#     with open(filename, 'w') as file:
+#         while True:
+#             frame = tello.get_frame_read().frame
+#             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # Define HSV color ranges
-            color_ranges = {
-                "Red": [(0, 120, 70), (10, 255, 255)],
-                "Orange": [(11, 100, 100), (25, 255, 255)],
-                "Yellow": [(26, 100, 100), (34, 255, 255)],
-                "Green": [(35, 100, 100), (85, 255, 255)],
-                "Blue": [(86, 100, 100), (125, 255, 255)],
-                "Purple": [(126, 100, 100), (160, 255, 255)],
-            }
+#             # Define HSV color ranges
+#             color_ranges = {
+#                 "Red": [(0, 120, 70), (10, 255, 255)],
+#                 "Orange": [(11, 100, 100), (25, 255, 255)],
+#                 "Yellow": [(26, 100, 100), (34, 255, 255)],
+#                 "Green": [(35, 100, 100), (85, 255, 255)],
+#                 "Blue": [(86, 100, 100), (125, 255, 255)],
+#                 "Purple": [(126, 100, 100), (160, 255, 255)],
+#             }
 
-            largest_area = 0
-            closest_color = None
+#             largest_area = 0
+#             closest_color = None
 
-            for color, (lower, upper) in color_ranges.items():
-                mask = cv2.inRange(hsv, np.array(lower), np.array(upper))
-                contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+#             for color, (lower, upper) in color_ranges.items():
+#                 mask = cv2.inRange(hsv, np.array(lower), np.array(upper))
+#                 contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-                for cnt in contours:
-                    area = cv2.contourArea(cnt)
-                    if area > largest_area:
-                        largest_area = area
-                        closest_color = color
+#                 for cnt in contours:
+#                     area = cv2.contourArea(cnt)
+#                     if area > largest_area:
+#                         largest_area = area
+#                         closest_color = color
 
-            # Log the closest color
-            if closest_color:
-                log = f"[{datetime.now().strftime('%I:%M:%S %p')}] Closest Color: {closest_color}"
-                print(log)
-                file.write(log + "\n")
-                file.flush()
+#             # Log the closest color
+#             if closest_color:
+#                 log = f"[{datetime.now().strftime('%I:%M:%S %p')}] Closest Color: {closest_color}"
+#                 print(log)
+#                 file.write(log + "\n")
+#                 file.flush()
 
-            # Wait 5 seconds before next detection
-            time.sleep(5)
+#             # Wait 5 seconds before next detection
+#             time.sleep(5)
 
-            # Optional break with key press
-            if keyboard.is_pressed("i"):
-                break
+#             # Optional break with key press
+#             if keyboard.is_pressed("i"):
+#                 break
 
-    cv2.destroyAllWindows()
-    print(f"Detection session saved to '{filename}'")
+#     cv2.destroyAllWindows()
+#     print(f"Detection session saved to '{filename}'")
+
 
 tello = Tello()
 tello.connect()
