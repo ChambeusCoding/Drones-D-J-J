@@ -9,6 +9,21 @@ import numpy as np
 import pygame
 import os
 
+# def get_data():
+#     # tello.query_sdk_version()
+#     # tello.query_serial_number()
+#     while True:
+#         try:
+#             tello.get_barometer()
+#             tello.get_height()
+#             tello.get_battery()
+#             tello.get_flight_time()
+#             tello.get_pitch()
+#             tello.get_roll()
+#             tello.get_temperature()
+#             tello.get_yaw()
+#         except KeyboardInterrupt:
+#             break
 def playMusic():
     try:
         pygame.mixer.init()
@@ -79,6 +94,8 @@ def control_drone():
             elif keyboard.is_pressed("t"):
                 tello.flip_right()
                 print("Flipped right.")
+            # elif keyboard.is_pressed("i"):
+            #     get_data()
             elif keyboard.is_pressed("v"):
                 print("Victory dance.")
                 victory()
@@ -158,10 +175,89 @@ def cam():
 #     cv2.destroyAllWindows()
 #     print(f"Detection session saved to '{filename}'")
 
+def colordetect():
+    tello.streamon()
+    print("Color detection armed. Press SPACEBAR to scan.")
+
+    filename = "RUNS.txt"
+
+    if not os.path.exists(filename):
+        open(filename, 'w').close()
+
+    with open(filename, 'a') as file:
+        while True:
+            frame = tello.get_frame_read().frame
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+            cv2.imshow("Tello Camera", frame)
+
+            if keyboard.is_pressed("space"):
+                print("[SPACEBAR] Scan triggered.")
+                color_ranges = {
+                "Red": [  # Red wraps around hue = 0, so we need two ranges
+                    (np.array([0, 150, 120]), np.array([10, 255, 255])),
+                    (np.array([170, 150, 120]), np.array([180, 255, 255]))
+                ],
+                "Orange": [
+                    (np.array([11, 180, 150]), np.array([20, 255, 255]))
+                ],
+                "Yellow": [
+                    (np.array([21, 180, 150]), np.array([30, 255, 255]))
+                ],
+                "Green": [
+                    (np.array([36, 150, 120]), np.array([80, 255, 255]))
+                ],
+                "Blue": [
+                    (np.array([95, 150, 120]), np.array([125, 255, 255]))
+                ],
+                "Purple": [
+                    (np.array([130, 170, 150]), np.array([155, 255, 255]))
+                ],
+            }
+                largest_area = 0
+                closest_color = None
+
+                for color, ranges in color_ranges.items():
+                    if not isinstance(ranges[0], tuple):
+                        ranges = [ranges]  # ensure all are lists of tuples
+                    mask = None
+                    for lower, upper in ranges:
+                        this_mask = cv2.inRange(hsv, lower, upper)
+                        mask = this_mask if mask is None else cv2.bitwise_or(mask, this_mask)
+                    
+                    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                    
+                    for cnt in contours:
+                        area = cv2.contourArea(cnt)
+                        if area > largest_area:
+                            largest_area = area
+                            closest_color = color
+                    for cnt in contours:
+                        area = cv2.contourArea(cnt)
+                        if area > largest_area:
+                            largest_area = area
+                            closest_color = color
+                if closest_color:
+                    timestamp = datetime.now().strftime("%d-%m-%Y %I:%M:%S %p")
+                    log = f"[{timestamp}] Closest Color: {closest_color}"
+                    print(log)  # Echo to terminal
+                    file.write(log + "\n")
+                    file.flush()
+                else:
+                    print("No dominant color detected.")
+
+                while keyboard.is_pressed("space"):
+                    pass
+
+            if cv2.waitKey(1) == 27:  # ESC only affects camera window
+                break
+
+    cv2.destroyAllWindows()
 
 tello = Tello()
 tello.connect()
 tello.streamon()
+tello.set_speed(50)
 t1 = threading.Thread(target=cam, args=())
 t2 = threading.Thread(target=control_drone, args=())
 t3 = threading.Thread(target=colordetect, args=())
